@@ -1,0 +1,6 @@
+services:
+  ditto-back:
+    build: .
+    image: ditto-back:latest
+    ports:
+      - "8080:8080"
