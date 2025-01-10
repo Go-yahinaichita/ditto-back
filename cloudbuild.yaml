@@ -1,0 +1,35 @@
+substitutions:
+  _REGION: 'asia-northeast1'
+  _CONTAINER: '${_REGION}-docker.pkg.dev/${PROJECT_ID}/ai-hackathon/ditto-back:${SHORT_SHA}'
+  _SERVICE_NAME: 'ditto-back-${BRANCH_NAME:0:7}'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+- name: 'ubuntu'
+  entrypoint: /bin/bash
+  args:
+    - -c
+    - touch .env
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: /bin/bash
+  args:
+    - -c
+    - |
+      DOCKER_BUILDKIT=1 docker build -t ${_CONTAINER} .
+      docker push ${_CONTAINER}
+
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - run
+    - deploy
+    - ${_SERVICE_NAME}
+    - '--image=${_CONTAINER}'
+    - '--region=${_REGION}'
+    - --max-instances=1
+    - --min-instances=0
+    - --port=8080
+    - --ingress=all
+    - --allow-unauthenticated
