@@ -1,7 +1,7 @@
 substitutions:
   _REGION: 'asia-northeast1'
   _CONTAINER: '${_REGION}-docker.pkg.dev/${PROJECT_ID}/ai-hackathon/ditto-back:${SHORT_SHA}'
-  _SERVICE_NAME: 'ditto-back-${BRANCH_NAME}'
+  _SERVICE_NAME: 'ditto-back-${BRANCH_NAME:0:7}'
 
 options:
   logging: CLOUD_LOGGING_ONLY
