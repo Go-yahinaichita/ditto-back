@@ -1,3 +1,13 @@
 {
-    "python.analysis.typeCheckingMode": "basic"
+    "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python",
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "always",
+            "source.organizeImports": "always"
+        },
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4
+    },
+    "python.analysis.typeCheckingMode": "basic",
 }
