@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     postgres_port: int = 5432
     postgres_db: str = ""
 
-    environment: str = "local"
+    environment: str = "feature"
 
     class Config:
         env_file = ".env"
