@@ -17,7 +17,7 @@ steps:
   args:
     - -c
     - |
-      docker build -t ${_CONTAINER} .
+      DOCKER_BUILDKIT=1 docker build -t ${_CONTAINER} .
       docker push ${_CONTAINER}
 
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
