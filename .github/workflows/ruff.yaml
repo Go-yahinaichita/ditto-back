@@ -3,8 +3,7 @@ name: ruff
 on: [push]
 
 jobs:
-  uv-example:
-    name: python
+  build:
     runs-on: ubuntu-latest
 
     steps:

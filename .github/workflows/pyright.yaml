@@ -3,8 +3,7 @@ name: pyright
 on: [push]
 
 jobs:
-  uv-example:
-    name: python
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,6 +22,6 @@ jobs:
 
       - name: Install the project
         run: uv sync --all-extras --dev
-        
+
       - name: Run pyright
         run: uv run pyright
