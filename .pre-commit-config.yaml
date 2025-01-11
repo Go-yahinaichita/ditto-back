@@ -1,0 +1,22 @@
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        name: Ruff check
+        description: "Run 'ruff check' for extremely fast Python linting"
+        args: [--fix]
+
+      - id: ruff-format
+        name: Ruff format
+        description: "Run 'ruff format' for extremely fast Python formatting"
+
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: uv run pyright
+        language: system
+        files: '\.(py|ipynb)$'
