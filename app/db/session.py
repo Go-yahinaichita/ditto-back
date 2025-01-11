@@ -1,8 +1,9 @@
-from app.core.config import setting
+from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request
-from sqlalchemy.ext.asyncio import async_sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+from app.core.config import setting
 
 
 def setup_db(app: FastAPI) -> None:
@@ -12,10 +13,10 @@ def setup_db(app: FastAPI) -> None:
     app.state.db_session = session
 
 
-async def get_db(request: Request):
-    session = request.app.state.db_session()
+async def get_db(request: Request) -> AsyncGenerator[AsyncSession, None]:
+    session: AsyncSession = request.app.state.db_session()
     try:
         yield session
     finally:
-        session.commit()
-        session.close()
+        await session.commit()
+        await session.close()

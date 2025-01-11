@@ -1,4 +1,5 @@
-from .user import User
 from app.db.base import Base
 
-__all__ = ["Base", "User"]
+from .chat import Chats, Messages
+
+__all__ = ("Base", "Chats", "Messages")

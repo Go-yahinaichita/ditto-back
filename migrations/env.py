@@ -1,9 +1,8 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
+from sqlalchemy import engine_from_config, pool
+
 from app.core.config import setting
 from app.models import Base
 
@@ -59,7 +58,9 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    config.set_section_option("alembic", "postgres_uri", setting.get_postgres_uri)
+    config.set_section_option(
+        "alembic", "postgres_uri", setting.get_alembic_postgres_uri
+    )
 
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
