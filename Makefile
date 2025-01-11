@@ -1,5 +1,6 @@
 .PHONY: check
 check:
+	uv run isort .
 	uvx ruff@latest check app . --fix
 	uvx ruff@latest format app .
 	uv run pyright
@@ -10,7 +11,7 @@ run:
 
 .PHONY: migrate
 migrate:
-	uv run alembic autogenerate -m "create table"
+	uv run alembic revision --autogenerate -m "create table"
 
 .PHONY: upgrade
 upgrade:
