@@ -13,6 +13,7 @@ dependencies = [
     "isort>=5.13.2",
     "langchain>=0.3.14",
     "langchain-google-vertexai>=2.0.10",
+    "langgraph>=0.2.64",
     "pydantic>=2.9.2",
     "pydantic-settings>=2.7.1",
     "pyright>=1.1.391",
