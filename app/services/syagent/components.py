@@ -1,8 +1,7 @@
 import asyncio
-from typing import Dict, Any, AsyncGenerator
+from typing import AsyncGenerator
 from langchain_google_vertexai import ChatVertexAI
 from langchain.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import AIMessageChunk
 
 from app.schemas.syagent import CurrentProfile, FutureProfile
