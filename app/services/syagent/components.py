@@ -85,7 +85,7 @@ class ChatGenerator:
         }
         async for chunk in chain.astream(formatted_data):
                 if isinstance(chunk, AIMessageChunk) and chunk.content:
-                    yield chunk.content
+                    yield str(chunk.content)
 
 # 使用例
 async def main():
