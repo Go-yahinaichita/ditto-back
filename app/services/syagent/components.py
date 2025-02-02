@@ -1,4 +1,3 @@
-import asyncio
 from typing import AsyncGenerator
 
 from langchain.prompts import ChatPromptTemplate
@@ -6,6 +5,7 @@ from langchain_core.messages import AIMessageChunk
 from langchain_google_vertexai import ChatVertexAI
 
 from app.schemas.syagent import CurrentProfile, FutureProfile
+from app.services.syagent.state import State
 
 
 class FutureSimulator:
@@ -58,65 +58,34 @@ class ChatGenerator:
                 (
                     "system",
                     """
-                    あなたはユーザーの未来の自己像を描くアシスタントです。 
-                    ユーザーの現在のプロフィールは
+                    あなたはユーザの未来の自己像としてユーザと会話するアシスタントです。 
+                    ユーザの現在のプロフィールは以下の通りです。
                     {current_profile}
                     あなたは以下の立場を確立し、以下のスキルを習得しました。
                     {future_profile}               
-                    ユーザの未来の自己像になりすまして、ユーザと自然な会話を行ってください。
+                    自然な会話を行うために、過去のメッセージを参考し、短く端的な回答を心がけてください。
+                    ユーザが不快に感じる可能性のあるトピックについて避けてください。
+                    必要な情報があれば、勝手に憶測せずにユーザに確認してください。
                     """,
                 ),
                 (
                     "human",
                     """
-                {input}
-                """,
+                    過去のメッセージ：{history}
+                    ユーザの入力：{input}
+                    """,
                 ),
             ]
         )
 
-    async def agenerate(
-        self,
-        current_profile: CurrentProfile,
-        future_profile: FutureProfile,
-        user_input: str,
-    ) -> AsyncGenerator[str, None]:
+    async def agenerate(self, state: State) -> AsyncGenerator[str, None]:
         chain = self.prompt | self.llm
         formatted_data = {
-            "current_profile": current_profile.to_str(),
-            "future_profile": future_profile.to_str(),
-            "input": user_input,
+            "current_profile": state["current_prof"].to_str(),
+            "future_profile": state["future_prof"].to_str(),
+            "history": state["messages"][:-1],
+            "input": state["messages"][-1],
         }
         async for chunk in chain.astream(formatted_data):
             if isinstance(chunk, AIMessageChunk) and chunk.content:
                 yield str(chunk.content)
-
-
-# 使用例
-async def main():
-    llm = ChatVertexAI(model="gemini-1.5-flash-002", temperature=0.7)
-    simulator = FutureSimulator(llm)
-    gen = ChatGenerator(llm)
-
-    user_data = CurrentProfile(
-        status="プログラミング初学者",
-        skills=["Python基礎", "データ分析入門"],
-        future_goals=["AIエンジニアとして活躍する"],
-    )
-    future_description = simulator.generate_future_profile(user_data, 10)
-    print(future_description)
-
-    while True:
-        user_input = input("\n[You]: ")
-        if user_input.lower() == "exit":
-            print("Exiting the chat. Have a great day!")
-            break
-
-        print("\n[Future Self]: ", end="")
-        async for chunk in gen.agenerate(user_data, future_description, user_input):
-            print(chunk, end="", flush=True)
-        print()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
