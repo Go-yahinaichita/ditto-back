@@ -7,13 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.api import api_router
 from app.core.config import setting
 from app.db.session import setup_db
-from app.services.chat.runnable import setup_runnable
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     setup_db(app)
-    setup_runnable(app)
     yield
     app.state.runnable.dispose()
     app.state.db_engine.dispose()

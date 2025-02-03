@@ -10,3 +10,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+# gcp
+service-account-key.json

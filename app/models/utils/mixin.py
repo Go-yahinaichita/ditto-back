@@ -9,3 +9,9 @@ class TimestampMixin(object):
     @declared_attr
     def created_at(cls) -> Mapped[DateTime]:
         return mapped_column(DateTime, default=datetime.now(), nullable=False)
+
+    @declared_attr
+    def updated_at(cls) -> Mapped[DateTime]:
+        return mapped_column(
+            DateTime, default=datetime.now(), onupdate=datetime.now(), nullable=False
+        )
