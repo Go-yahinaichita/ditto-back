@@ -26,7 +26,7 @@
       }
     ],
     "workspaceFolder": "/workspace",
-    "postAttachCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && sudo chown -R vscode /home/vscode/.cache/uv /home/vscode/.cache/pyright-python ${containerWorkspaceFolder}/.venv /home/vscode/.cache/pre-commit && uv sync --frozen && uv run pre-commit install && gcloud init --no-launch-browser && gcloud auth login",
+    "postAttachCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && sudo chown -R vscode /home/vscode/.cache/uv /home/vscode/.cache/pyright-python ${containerWorkspaceFolder}/.venv /home/vscode/.cache/pre-commit && uv sync --frozen && uv run pre-commit install && gcloud init --no-launch-browser && gcloud auth application-default login",
     "remoteUser": "vscode",
     "customizations": {
       "vscode": {
