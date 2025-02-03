@@ -1,8 +1,9 @@
 import asyncio
+from typing import Annotated, List
 
 from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
 from langchain_google_vertexai import ChatVertexAI
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph.message import add_messages
 from langgraph.graph.state import END, START, CompiledStateGraph, StateGraph
 
 from app.schemas.syagent import CurrentProfile, FutureProfile
@@ -52,20 +53,14 @@ class ChatWorkflow:
     def __init__(
         self,
         model: ChatVertexAI,
-        session_id: str,
         current_profile: CurrentProfile,
         future_profile: FutureProfile,
     ):
         self.model = model
-        self.session_id = session_id
         self.chat_generator = ChatGenerator(self.model)
-        self.memory = MemorySaver()
         self.workflow = self._build_workflow()
-        self.state: State = {
-            "messages": [],
-            "current_prof": current_profile,
-            "future_prof": future_profile,
-        }
+        self.current_prof = current_profile
+        self.future_prof = future_profile
 
     def _build_workflow(self) -> CompiledStateGraph:
         async def chat(state: State):
@@ -78,15 +73,21 @@ class ChatWorkflow:
         graph.add_node("agent", chat)
         graph.add_edge(START, "agent")
         graph.add_edge("agent", END)
-        workflow = graph.compile(checkpointer=self.memory)
+        workflow = graph.compile()
         return workflow
 
-    async def process_input(self, user_input: str):
+    async def process_input(
+        self, history: Annotated[List, add_messages], user_input: str
+    ):
         inputs = [HumanMessage(content=user_input)]
-        self.state["messages"] += inputs
+        history += inputs
+        state: State = {
+            "messages": history,
+            "current_prof": self.current_prof,
+            "future_prof": self.future_prof,
+        }
         async for msg, _ in self.workflow.astream(
-            self.state,
-            config={"configurable": {"thread_id": self.session_id}},
+            state,
             stream_mode="messages",
         ):
             if isinstance(msg, AIMessageChunk) and msg.content:
@@ -96,7 +97,6 @@ class ChatWorkflow:
 # 使用例
 async def main():
     llm = ChatVertexAI(model="gemini-1.5-flash-002")
-    session_id = "0001"
     user_data = CurrentProfile(
         status="学生",
         skills=["英語が流暢に話せる", "サッカー"],
@@ -104,16 +104,17 @@ async def main():
     )
     sim_wf = SimulationWorkflow(llm, user_data)
     future_avatar = sim_wf.generate(10)
-    chat_wf = ChatWorkflow(llm, session_id, user_data, future_avatar)
+    chat_wf = ChatWorkflow(llm, user_data, future_avatar)
 
+    history = []
     while True:
         user_input = input("\n[You]: ")
         if user_input.lower() == "exit":
             print("チャットを終了します")
             break
-
+        # historyの更新未実装
         print("\n[Future Self]: ", end="")
-        async for chunk in chat_wf.process_input(user_input):
+        async for chunk in chat_wf.process_input(history, user_input):
             print(chunk, end="", flush=True)
         print()
 
