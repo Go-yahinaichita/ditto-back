@@ -1,5 +1,10 @@
 from app.db.base import Base
+from app.models.ai_chat import Conversations, CurrentProfiles, FutureAvatars, Messages
 
-from .chat import Chats, Messages
-
-__all__ = ("Base", "Chats", "Messages")
+__all__ = (
+    "Base",
+    "CurrentProfiles",
+    "FutureAvatars",
+    "Conversations",
+    "Messages",
+)

@@ -1,0 +1,49 @@
+{
+    "name": "${localWorkspaceFolderBasename}",
+    "dockerComposeFile": ["docker-compose.yaml"],
+    "service": "backend",
+    "runServices": ["backend", "sql-proxy"],
+    "mounts": [
+      {
+        "type": "volume",
+        "source": "uv-cache",
+        "target": "/home/vscode/.cache/uv"
+      },
+      {
+        "type": "volume",
+        "source": "pyyright-cache",
+        "target": "/home/vscode/.cache/pyright-python"
+      },
+      {
+        "type": "volume",
+        "source": "venv-cache",
+        "target": "${containerWorkspaceFolder}/.venv"
+      },
+      {
+        "type": "volume",
+        "source": "pre-commit-cache",
+        "target": "/home/vscode/.cache/pre-commit"
+      }
+    ],
+    "workspaceFolder": "/workspace",
+    "postAttachCommand": "sudo chown -R vscode /home/vscode/.cache/uv /home/vscode/.cache/pyright-python ${containerWorkspaceFolder}/.venv /home/vscode/.cache/pre-commit && uv sync --frozen && uv run pre-commit install",
+    "remoteUser": "vscode",
+    "customizations": {
+      "vscode": {
+        "settings": {
+          "git.openRepositoryInParentFolders": "always",
+          "python.defaultInterpreterPath": "/workspace/.venv/bin/python"
+        },
+        "extensions": [
+          "ms-python.python",
+          "ms-python.vscode-pylance",
+          "streetsidesoftware.code-spell-checker",
+          "charliermarsh.ruff",
+          "tamasfe.even-better-toml",
+          "ms-azuretools.vscode-docker",
+          "mhutchie.git-graph",
+          "GitHub.copilot"
+        ]
+      }
+    }
+  }

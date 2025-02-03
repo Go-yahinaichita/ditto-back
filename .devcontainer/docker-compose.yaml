@@ -1,0 +1,27 @@
+services:
+  backend:
+    hostname: backend
+    build: .
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    user: vscode
+    volumes:
+      - ..:/workspace:cached
+    networks:
+      - app-network
+  sql-proxy:
+    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.0
+    restart: unless-stopped
+    command: [
+      "--credentials-file", 
+      "/config/service-account-key.json",
+      "--address=0.0.0.0",
+      "ai-hackathon-445606:asia-northeast1:ditto-back"
+    ]
+    volumes:
+      - ./service-account-key.json:/config/service-account-key.json
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
