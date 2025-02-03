@@ -6,10 +6,10 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # Project settings
     postgres_user: str
-    postgres_password: str = ""
+    postgres_password: str
     postgres_host: str
     postgres_port: int = 5432
-    postgres_db: str = ""
+    postgres_db: str
 
     environment: str = "feature"
 
@@ -49,3 +49,4 @@ setting = Settings()  # type: ignore
 if __name__ == "__main__":
     print(setting)
     print(setting.get_postgres_uri)
+    print(setting.get_alembic_postgres_uri)

@@ -1,9 +1,38 @@
+from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class OutputConversation(BaseModel):
+    """会話の情報"""
+
+    id: int = Field(..., description="会話のID")
+    title: str = Field(..., description="会話のタイトル")
+    created_at: datetime = Field(..., description="作成日時")
+    updated_at: datetime = Field(..., description="更新日時")
+    model_config = ConfigDict(from_attributes=True)
+
+
+class InputMessage(BaseModel):
+    """メッセージの入力情報"""
+
+    message: str = Field(..., description="メッセージの内容")
+
+
+class OutputMessage(BaseModel):
+    """メッセージの出力情報"""
+
+    id: int = Field(..., description="メッセージのID")
+    message: str = Field(..., description="メッセージの内容")
+    created_at: datetime = Field(..., description="作成日時")
+    updated_at: datetime = Field(..., description="更新日時")
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CurrentProfile(BaseModel):
+    """現在のプロフィールの入力情報"""
+
     status: str = Field(..., description="現在の状況や立場")
     skills: List[str] = Field(..., description="現在持っているスキルのリスト")
     future_goals: List[str] = Field(..., description="将来の目標ややりたいことのリスト")

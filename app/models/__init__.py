@@ -1,10 +1,10 @@
 from app.db.base import Base
-from app.models.syagent import Conversations, CurrentProfiles, FutureAvatars, Messages
+from app.models.syagent import Conversation, CurrentProfile, FutureAvatar, Message
 
 __all__ = (
     "Base",
-    "CurrentProfiles",
-    "FutureAvatars",
-    "Conversations",
-    "Messages",
+    "CurrentProfile",
+    "FutureAvatar",
+    "Conversation",
+    "Message",
 )
