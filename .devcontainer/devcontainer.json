@@ -41,8 +41,11 @@
           "charliermarsh.ruff",
           "tamasfe.even-better-toml",
           "ms-azuretools.vscode-docker",
+          "github.vscode-pull-request-github",
+          "ms-vsliveshare.vsliveshare",
           "mhutchie.git-graph",
-          "GitHub.copilot"
+          "GitHub.copilot",
+          "eamodio.gitlens"
         ]
       }
     }
