@@ -21,7 +21,6 @@ class SimulationWorkflow:
         self.future_simulator = FutureSimulator(self.model)
         self.workflow = self._build_workflow()
         self.current_prof = current_profile
-        self.time_frame = 10
 
     def _build_workflow(self) -> CompiledStateGraph:
         def call_model(state: State):
@@ -69,15 +68,14 @@ class ChatWorkflow:
         }
 
     def _build_workflow(self) -> CompiledStateGraph:
-        async def call_model(state: State):
+        async def chat(state: State):
             response = ""
             async for chunk in self.chat_generator.agenerate(state):
                 response += chunk
-
             return {"messages": [AIMessage(content=response)]}
 
         graph = StateGraph(State)
-        graph.add_node("agent", call_model)
+        graph.add_node("agent", chat)
         graph.add_edge(START, "agent")
         graph.add_edge("agent", END)
         workflow = graph.compile(checkpointer=self.memory)
@@ -100,13 +98,12 @@ async def main():
     llm = ChatVertexAI(model="gemini-1.5-flash-002")
     session_id = "0001"
     user_data = CurrentProfile(
-        status="プログラミング初学者",
-        skills=["Python基礎", "データ分析入門"],
-        future_goals=["AIエンジニアとして活躍する"],
+        status="学生",
+        skills=["英語が流暢に話せる", "サッカー"],
+        future_goals=["世界で活躍する"],
     )
     sim_wf = SimulationWorkflow(llm, user_data)
     future_avatar = sim_wf.generate(10)
-
     chat_wf = ChatWorkflow(llm, session_id, user_data, future_avatar)
 
     while True:
