@@ -1,5 +1,5 @@
 from app.db.base import Base
-from app.models.ai_chat import Conversations, CurrentProfiles, FutureAvatars, Messages
+from app.models.syagent import Conversations, CurrentProfiles, FutureAvatars, Messages
 
 __all__ = (
     "Base",
