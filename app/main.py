@@ -13,7 +13,6 @@ from app.db.session import setup_db
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     setup_db(app)
     yield
-    app.state.runnable.dispose()
     app.state.db_engine.dispose()
 
 
