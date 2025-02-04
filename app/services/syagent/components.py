@@ -9,6 +9,10 @@ from app.services.syagent.state import State
 
 
 class FutureSimulator:
+    """
+    現在のプロフィールを基に未来のプロフィールを生成する。
+    """
+
     def __init__(self, llm: ChatVertexAI):
         self.llm = llm
         self.prompt = ChatPromptTemplate(
@@ -37,9 +41,6 @@ class FutureSimulator:
     def generate_future_profile(
         self, current_profile: CurrentProfile, timeframe: int
     ) -> FutureProfile:
-        """
-        現在のプロフィールを基に未来のプロフィールを生成する。
-        """
         chain = self.prompt | self.llm.with_structured_output(FutureProfile)
         input_data = {
             "timeframe": timeframe,
