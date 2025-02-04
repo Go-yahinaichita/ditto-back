@@ -10,12 +10,19 @@ class CurrentProfile(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(BigInteger)  # Firebase uid
-    future_avatars: Mapped["FutureAvatar"] = relationship(
-        "FutureAvatar", back_populates="current_profile"
+    status: Mapped[str] = mapped_column(String, nullable=False)
+    future_profile: Mapped["FutureProfile"] = relationship(
+        "FutureProfile", back_populates="current_profile", cascade="all, delete-orphan"
+    )
+    current_skills: Mapped[list["CurrentSkill"]] = relationship(
+        "CurrentSkill", back_populates="current_profile", cascade="all, delete-orphan"
+    )
+    future_goals: Mapped[list["FutureGoal"]] = relationship(
+        "FutureGoal", back_populates="current_profile", cascade="all, delete-orphan"
     )
 
 
-class FutureAvatar(Base, TimestampMixin):
+class FutureProfile(Base, TimestampMixin):
     __tablename__ = "future_profiles"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
@@ -26,11 +33,16 @@ class FutureAvatar(Base, TimestampMixin):
         nullable=False,
         unique=True,
     )
+    status: Mapped[str] = mapped_column(String, nullable=False)
+    time_frame: Mapped[int] = mapped_column(BigInteger, nullable=False)
     current_profile: Mapped["CurrentProfile"] = relationship(
-        "CurrentProfile", back_populates="future_avatar"
+        "CurrentProfile", back_populates="future_profile"
     )
-    conversations: Mapped["Conversation"] = relationship(
-        "Conversation", back_populates="future_avatar"
+    conversation: Mapped["Conversation"] = relationship(
+        "Conversation", back_populates="future_profile", cascade="all, delete-orphan"
+    )
+    future_skills: Mapped[list["FutureSkill"]] = relationship(
+        "FutureSkill", back_populates="future_profile", cascade="all, delete-orphan"
     )
 
 
@@ -39,18 +51,18 @@ class Conversation(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(BigInteger)  # Firebase uid
-    future_avatar_id: Mapped[int] = mapped_column(
+    future_profile_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("future_profiles.id", ondelete="CASCADE"),
         nullable=False,
         unique=True,
     )
     title: Mapped[str] = mapped_column(String, nullable=False)
-    future_avatar: Mapped["FutureAvatar"] = relationship(
-        "FutureAvatar", back_populates="conversation"
+    future_profile: Mapped["FutureProfile"] = relationship(
+        "FutureProfile", back_populates="conversation"
     )
     messages: Mapped[list["Message"]] = relationship(
-        "Message", back_populates="conversation"
+        "Message", back_populates="conversation", cascade="all, delete-orphan"
     )
 
 
@@ -59,10 +71,53 @@ class Message(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     role: Mapped[str] = mapped_column(String, nullable=False)  # TODO: Enum
-    Message: Mapped[str] = mapped_column(String, nullable=False)
+    message: Mapped[str] = mapped_column(String, nullable=False)
     conversation_id: Mapped[int] = mapped_column(
         BigInteger, ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False
     )
     conversation: Mapped["Conversation"] = relationship(
-        "Conversation", back_populates="message"
+        "Conversation", back_populates="messages"
+    )
+
+
+class CurrentSkill(Base, TimestampMixin):
+    __tablename__ = "current_skills"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    current_profile_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey("current_profiles.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    skill: Mapped[str] = mapped_column(String, nullable=False)
+    current_profile: Mapped["CurrentProfile"] = relationship(
+        "CurrentProfile", back_populates="current_skills"
+    )
+
+
+class FutureSkill(Base, TimestampMixin):
+    __tablename__ = "future_skills"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    future_profile_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("future_profiles.id", ondelete="CASCADE"), nullable=False
+    )
+    skill: Mapped[str] = mapped_column(String, nullable=False)
+    future_profile: Mapped["FutureProfile"] = relationship(
+        "FutureProfile", back_populates="future_skills"
+    )
+
+
+class FutureGoal(Base, TimestampMixin):
+    __tablename__ = "future_goals"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    current_profile_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey("current_profiles.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    goal: Mapped[str] = mapped_column(String, nullable=False)
+    current_profile: Mapped["CurrentProfile"] = relationship(
+        "CurrentProfile", back_populates="future_goals"
     )

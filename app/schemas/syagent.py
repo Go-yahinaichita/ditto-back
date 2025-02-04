@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -24,6 +24,9 @@ class OutputMessage(BaseModel):
     """メッセージの出力情報"""
 
     id: int = Field(..., description="メッセージのID")
+    role: Literal["user", "agent"] = Field(
+        ..., description="メッセージの役割（ユーザーかエージェントか）"
+    )
     message: str = Field(..., description="メッセージの内容")
     created_at: datetime = Field(..., description="作成日時")
     updated_at: datetime = Field(..., description="更新日時")
@@ -34,8 +37,8 @@ class CurrentProfile(BaseModel):
     """現在のプロフィールの入力情報"""
 
     status: str = Field(..., description="現在の状況や立場")
-    skills: List[str] = Field(..., description="現在持っているスキルのリスト")
-    future_goals: List[str] = Field(..., description="将来の目標ややりたいことのリスト")
+    skills: list[str] = Field(..., description="現在持っているスキルのリスト")
+    future_goals: list[str] = Field(..., description="将来の目標ややりたいことのリスト")
 
     def to_str(self):
         return f" 現在の立場や職業: {self.status}、現在持っているスキル: {', '.join(self.skills)}、将来の目標: {', '.join(self.future_goals)}"
@@ -43,7 +46,7 @@ class CurrentProfile(BaseModel):
 
 class FutureProfile(BaseModel):
     status: str = Field(..., description="未来の状況や立場")
-    skills: List[str] = Field(
+    skills: list[str] = Field(
         ..., description="未来において持つと想定されるスキルのリスト"
     )
     time_frame: int = Field(

@@ -103,8 +103,8 @@ async def main():
         future_goals=["世界で活躍する"],
     )
     sim_wf = SimulationWorkflow(llm, user_data)
-    future_avatar = sim_wf.generate(10)
-    chat_wf = ChatWorkflow(llm, user_data, future_avatar)
+    future_profile = sim_wf.generate(10)
+    chat_wf = ChatWorkflow(llm, user_data, future_profile)
 
     history = []
     while True:
@@ -116,7 +116,7 @@ async def main():
         print("\n[Future Self]: ", end="")
         async for chunk in chat_wf.process_input(history, user_input):
             print(chunk, end="", flush=True)
-        print()
+        print(history)
 
 
 # 非同期実行のセットアップ
