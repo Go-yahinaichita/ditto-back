@@ -4,7 +4,39 @@ from langchain.prompts import ChatPromptTemplate
 from langchain_core.messages import AIMessageChunk
 from langchain_google_vertexai import ChatVertexAI
 
-from app.schemas.syagent import ChatState, FutureProfile
+from app.schemas.syagent import ChatState, CurrentProfile, FutureProfile
+
+
+class Interviewer:
+    def __init__(self, llm: ChatVertexAI):
+        self.llm = llm
+        self.prompt = ChatPromptTemplate(
+            [
+                (
+                    "system",
+                    """
+                あなたは、ユーザの情報からユーザの未来像の予測に協力するインタビュアです。
+                ユーザの未来像を正確に予測するために必要な情報をユーザに質問してください。
+                必ず質問は1つのみ行ってください。             
+                """,
+                ),
+                (
+                    "human",
+                    """
+                現在のユーザの情報は以下の通りです。 
+                {current_profile}
+                """,
+                ),
+            ]
+        )
+
+    def generate_question(self, current_profile: CurrentProfile) -> str:
+        chain = self.prompt | self.llm
+        input_data = {
+            "current_profile": current_profile.to_str(),
+        }
+        response: str = chain.invoke(input_data).content  # type:ignore
+        return response
 
 
 class FutureSimulator:
