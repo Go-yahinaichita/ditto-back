@@ -97,9 +97,11 @@ async def main():
     user_data = CurrentProfile(
         age=20,
         restrictions="親の面倒を見る必要がある",
+        values="家族を大切にしたい",
         status="学生",
         skills=["英語が流暢に話せる", "サッカー"],
         future_goals=["世界で活躍する"],
+        extra="",
     )
     sim_wf = SimulationWorkflow(llm, user_data)
     future_avatar = sim_wf.generate(10)
@@ -116,7 +118,6 @@ async def main():
         print("\n[Future Self]: ", end="")
         async for chunk in chat_wf.process_input(history, user_input):
             print(chunk, end="", flush=True)
-        print(history)
 
 
 # 非同期実行のセットアップ
