@@ -4,8 +4,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain_core.messages import AIMessageChunk
 from langchain_google_vertexai import ChatVertexAI
 
-from app.schemas.syagent import CurrentProfile, FutureProfile
-from app.services.syagent.state import State
+from app.schemas.syagent import ChatState, FutureProfile
 
 
 class FutureSimulator:
@@ -22,11 +21,7 @@ class FutureSimulator:
                     """
                 あなたはユーザーの{timeframe}年後の未来のプロフィールを作成するアシスタントです。
                 現在のプロフィールに基づいて、成長と目標を反映した未来のプロフィールを生成してください。
-                以下のjson形式で出力してください。
-                {{
-                    "status": "将来の立場や職業についての簡潔な説明",
-                    "skills": ["獲得したスキルのリスト"]
-                }}                
+                summaryの項目は生成したプロフィールの立場、職業を10~20文字程度で要約してください。               
                 """,
                 ),
                 (
@@ -38,16 +33,13 @@ class FutureSimulator:
             ]
         )
 
-    def generate_future_profile(
-        self, current_profile: CurrentProfile, timeframe: int
-    ) -> FutureProfile:
+    def generate_future_profile(self, state: ChatState) -> FutureProfile:
         chain = self.prompt | self.llm.with_structured_output(FutureProfile)
         input_data = {
-            "timeframe": timeframe,
-            "current_profile": current_profile.to_str(),
+            "timeframe": state.future_prof.time_frame,
+            "current_profile": state.current_prof.to_str(),
         }
         response: FutureProfile = chain.invoke(input_data)  # type:ignore
-        response.time_frame = timeframe
         return response
 
 
@@ -79,13 +71,13 @@ class ChatGenerator:
             ]
         )
 
-    async def agenerate(self, state: State) -> AsyncGenerator[str, None]:
+    async def agenerate(self, state: ChatState) -> AsyncGenerator[str, None]:
         chain = self.prompt | self.llm
         formatted_data = {
-            "current_profile": state["current_prof"].to_str(),
-            "future_profile": state["future_prof"].to_str(),
-            "history": state["messages"][:-1],
-            "input": state["messages"][-1],
+            "current_profile": state.current_prof.to_str(),
+            "future_profile": state.future_prof.to_str(),
+            "history": state.messages[:-1],
+            "input": state.messages[-1],
         }
         async for chunk in chain.astream(formatted_data):
             if isinstance(chunk, AIMessageChunk) and chunk.content:
