@@ -44,25 +44,23 @@ class CurrentProfile(BaseModel):
     """現在のプロフィールの入力情報"""
 
     age: int = Field(..., description="年齢")
-    restrictions: str = Field(..., description="経済面、環境面での制約")
-    values: str = Field(..., description="価値観")
-
     status: str = Field(..., description="現在の立場や職業")
     skills: list[str] = Field(..., description="現在持っているスキルのリスト")
+    values: str = Field(..., description="価値観")
+    restrictions: str = Field(..., description="経済面、環境面での制約")
     future_goals: list[str] = Field(..., description="将来の目標ややりたいことのリスト")
-
     extra: str = Field(..., description="補足、追加情報")
 
     def to_str(self):
         return (
             f"現在のプロフィール:\n"
             f"- 年齢: {self.age}\n"
-            f"- 制約: {self.restrictions}\n"
-            f"- 価値観: {self.values}\n"
             f"- 現在の立場や職業: {self.status}\n"
             f"- 現在持っているスキル: {', '.join(self.skills)}\n"
+            f"- 価値観: {self.values}\n"
+            f"- 制約: {self.restrictions}\n"
             f"- 将来の目標: {', '.join(self.future_goals)}\n"
-            f"- 補足: {self.extra}"
+            f"- 補足情報: {self.extra}"
         )
 
 

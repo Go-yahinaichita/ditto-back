@@ -97,7 +97,7 @@ async def main():
     user_data = CurrentProfile(
         age=20,
         restrictions="親の面倒を見る必要がある",
-        values="家族を大切にしたい",
+        values="健康第一",
         status="学生",
         skills=["英語が流暢に話せる", "サッカー"],
         future_goals=["世界で活躍する"],
