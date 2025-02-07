@@ -1,0 +1,4 @@
+{
+    "exclude": ["migrations", "**/.venv"],
+    "ignore": ["migrations"],
+}

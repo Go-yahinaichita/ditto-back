@@ -9,8 +9,12 @@ class CurrentProfile(Base, TimestampMixin):
     __tablename__ = "current_profiles"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(BigInteger)  # Firebase uid
+    user_id: Mapped[str] = mapped_column(String, unique=True)  # Firebase uid
+    age: Mapped[int] = mapped_column(BigInteger, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False)
+    values: Mapped[str] = mapped_column(String, nullable=False)
+    restrictions: Mapped[str] = mapped_column(String, nullable=False)
+    extra: Mapped[str] = mapped_column(String, nullable=False)
     future_profile: Mapped["FutureProfile"] = relationship(
         "FutureProfile", back_populates="current_profile", cascade="all, delete-orphan"
     )
@@ -26,7 +30,7 @@ class FutureProfile(Base, TimestampMixin):
     __tablename__ = "future_profiles"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(BigInteger)  # Firebase uid
+    user_id: Mapped[str] = mapped_column(String)  # Firebase uid
     current_profile_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("current_profiles.id", ondelete="CASCADE"),
@@ -35,6 +39,7 @@ class FutureProfile(Base, TimestampMixin):
     )
     status: Mapped[str] = mapped_column(String, nullable=False)
     time_frame: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    summary: Mapped[str] = mapped_column(String, nullable=False)
     current_profile: Mapped["CurrentProfile"] = relationship(
         "CurrentProfile", back_populates="future_profile"
     )
@@ -50,7 +55,7 @@ class Conversation(Base, TimestampMixin):
     __tablename__ = "conversations"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(BigInteger)  # Firebase uid
+    user_id: Mapped[str] = mapped_column(String)  # Firebase uid
     future_profile_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("future_profiles.id", ondelete="CASCADE"),
