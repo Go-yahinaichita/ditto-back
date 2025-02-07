@@ -176,14 +176,19 @@ async def create_message(
     chat_wf = syagent_service.ChatWorkflow(
         llm,
         syagent_schema.CurrentProfile(
+            age=20,  ###Placeholder
             status=current_profile.status,
             skills=[skill.skill for skill in current_skills] if current_skills else [],
+            values="",  ###Placeholder
+            restrictions="",  ###Placeholder
             future_goals=[goal.goal for goal in future_goals] if future_goals else [],
+            extra="",  ###Placeholder
         ),
         syagent_schema.FutureProfile(
             status=future_profile.status,
             time_frame=future_profile.time_frame,
             skills=[skill.skill for skill in future_skills] if future_skills else [],
+            summary="",  ###Placeholder
         ),
     )
     history = []
