@@ -13,7 +13,7 @@ llm = ChatVertexAI(model="gemini-1.5-flash-002")
 
 
 async def read_conversations(
-    db: AsyncSession, user_id: int
+    db: AsyncSession, user_id: str
 ) -> list[syagent_schema.OutputConversation]:
     """
     ユーザが持つ会話のリストを取得する。
@@ -31,7 +31,7 @@ async def read_conversations(
 
 
 async def create_conversation(
-    db: AsyncSession, user_id: int, current_profile: syagent_schema.CurrentProfile
+    db: AsyncSession, user_id: str, current_profile: syagent_schema.CurrentProfile
 ) -> syagent_schema.OutputConversation:
     """
     ユーザの情報から、将来の自己像を生成し、会話を開始する。
