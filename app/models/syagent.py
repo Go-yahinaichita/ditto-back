@@ -10,7 +10,11 @@ class CurrentProfile(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(BigInteger)  # Firebase uid
+    age: Mapped[int] = mapped_column(BigInteger, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False)
+    values: Mapped[str] = mapped_column(String, nullable=False)
+    restrictions: Mapped[str] = mapped_column(String, nullable=False)
+    extra: Mapped[str] = mapped_column(String, nullable=False)
     future_profile: Mapped["FutureProfile"] = relationship(
         "FutureProfile", back_populates="current_profile", cascade="all, delete-orphan"
     )
@@ -35,6 +39,7 @@ class FutureProfile(Base, TimestampMixin):
     )
     status: Mapped[str] = mapped_column(String, nullable=False)
     time_frame: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    summary: Mapped[str] = mapped_column(String, nullable=False)
     current_profile: Mapped["CurrentProfile"] = relationship(
         "CurrentProfile", back_populates="future_profile"
     )

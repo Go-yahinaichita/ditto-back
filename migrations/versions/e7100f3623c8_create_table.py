@@ -1,8 +1,8 @@
 """create table
 
-Revision ID: 2de1549aa020
+Revision ID: e7100f3623c8
 Revises:
-Create Date: 2025-02-04 15:51:20.354855
+Create Date: 2025-02-07 08:01:59.555068
 
 """
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "2de1549aa020"
+revision: str = "e7100f3623c8"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,7 +24,11 @@ def upgrade() -> None:
         "current_profiles",
         sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
         sa.Column("user_id", sa.BigInteger(), nullable=False),
+        sa.Column("age", sa.BigInteger(), nullable=False),
         sa.Column("status", sa.String(), nullable=False),
+        sa.Column("values", sa.String(), nullable=False),
+        sa.Column("restrictions", sa.String(), nullable=False),
+        sa.Column("extra", sa.String(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
@@ -60,6 +64,7 @@ def upgrade() -> None:
         sa.Column("current_profile_id", sa.BigInteger(), nullable=False),
         sa.Column("status", sa.String(), nullable=False),
         sa.Column("time_frame", sa.BigInteger(), nullable=False),
+        sa.Column("summary", sa.String(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
