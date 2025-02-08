@@ -9,7 +9,7 @@ class CurrentProfile(Base, TimestampMixin):
     __tablename__ = "current_profiles"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String, unique=True)  # Firebase uid
+    user_id: Mapped[str] = mapped_column(String, nullable=False)  # Firebase uid
     age: Mapped[int] = mapped_column(BigInteger, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False)
     values: Mapped[str] = mapped_column(String, nullable=False)
@@ -30,7 +30,7 @@ class FutureProfile(Base, TimestampMixin):
     __tablename__ = "future_profiles"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String)  # Firebase uid
+    user_id: Mapped[str] = mapped_column(String, nullable=False)  # Firebase uid
     current_profile_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("current_profiles.id", ondelete="CASCADE"),
@@ -55,7 +55,7 @@ class Conversation(Base, TimestampMixin):
     __tablename__ = "conversations"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String)  # Firebase uid
+    user_id: Mapped[str] = mapped_column(String, nullable=False)  # Firebase uid
     future_profile_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("future_profiles.id", ondelete="CASCADE"),
