@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from langchain_core.messages import AIMessage, HumanMessage
 from langchain_google_vertexai import ChatVertexAI
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -201,9 +200,13 @@ async def create_message(
     if messages:
         for message in messages:
             if message.role == "user":
-                history.append(HumanMessage(content=message.message, id=message.id))
+                history.append(
+                    syagent_schema.RoleMessage(role="user", content=message.message)
+                )
             elif message.role == "agent":
-                history.append(AIMessage(content=message.message, id=message.id))
+                history.append(
+                    syagent_schema.RoleMessage(role="agent", content=message.message)
+                )
     user_input = input_message.message
     st_message = ""
     streaming_messages: list[str] = []
