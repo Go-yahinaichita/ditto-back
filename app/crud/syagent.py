@@ -93,7 +93,7 @@ async def create_conversation(
     conversation = syagent_model.Conversation(
         user_id=user_id,
         future_profile_id=future_profile.id,
-        title="Conversation",
+        title=future_profile.summary,
     )
     db.add(conversation)
     await db.flush()
