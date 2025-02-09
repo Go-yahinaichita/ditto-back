@@ -1,8 +1,8 @@
 """create table
 
-Revision ID: e7100f3623c8
+Revision ID: 035b700c6156
 Revises:
-Create Date: 2025-02-07 08:01:59.555068
+Create Date: 2025-02-09 14:39:19.132198
 
 """
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "e7100f3623c8"
+revision: str = "035b700c6156"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -23,7 +23,7 @@ def upgrade() -> None:
     op.create_table(
         "current_profiles",
         sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
-        sa.Column("user_id", sa.BigInteger(), nullable=False),
+        sa.Column("user_id", sa.String(), nullable=False),
         sa.Column("age", sa.BigInteger(), nullable=False),
         sa.Column("status", sa.String(), nullable=False),
         sa.Column("values", sa.String(), nullable=False),
@@ -60,7 +60,7 @@ def upgrade() -> None:
     op.create_table(
         "future_profiles",
         sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
-        sa.Column("user_id", sa.BigInteger(), nullable=False),
+        sa.Column("user_id", sa.String(), nullable=False),
         sa.Column("current_profile_id", sa.BigInteger(), nullable=False),
         sa.Column("status", sa.String(), nullable=False),
         sa.Column("time_frame", sa.BigInteger(), nullable=False),
@@ -76,9 +76,10 @@ def upgrade() -> None:
     op.create_table(
         "conversations",
         sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
-        sa.Column("user_id", sa.BigInteger(), nullable=False),
+        sa.Column("user_id", sa.String(), nullable=False),
         sa.Column("future_profile_id", sa.BigInteger(), nullable=False),
         sa.Column("title", sa.String(), nullable=False),
+        sa.Column("icon", sa.String(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
