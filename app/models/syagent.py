@@ -63,6 +63,7 @@ class Conversation(Base, TimestampMixin):
         unique=True,
     )
     title: Mapped[str] = mapped_column(String, nullable=False)
+    icon: Mapped[str] = mapped_column(String, nullable=False)
     future_profile: Mapped["FutureProfile"] = relationship(
         "FutureProfile", back_populates="conversation"
     )

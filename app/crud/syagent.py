@@ -7,6 +7,7 @@ from app.models import syagent as syagent_model
 from app.schemas import syagent as syagent_schema
 from app.schemas import utils as utils_schema
 from app.services.syagent import agents as syagent_service
+from app.services.syagent.image import generate_icon
 
 llm = ChatVertexAI(model="gemini-1.5-flash-002")
 
@@ -93,6 +94,7 @@ async def create_conversation(
         user_id=user_id,
         future_profile_id=future_profile.id,
         title=future_profile.summary,
+        icon=generate_icon(future_profile.summary),
     )
     db.add(conversation)
     await db.flush()

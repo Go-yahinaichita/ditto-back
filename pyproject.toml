@@ -19,6 +19,7 @@ dependencies = [
     "pyright>=1.1.391",
     "sqlalchemy[asyncio]==2.0.36",
     "uvicorn[standard]>=0.34.0",
+    "vertexai>=1.43.0",
 ]
 
 [project.scripts]

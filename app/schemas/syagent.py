@@ -9,6 +9,7 @@ class OutputConversation(BaseModel):
 
     id: int = Field(..., description="会話のID")
     title: str = Field(..., description="会話のタイトル")
+    icon: str = Field(..., description="会話のアイコン")
     created_at: datetime = Field(..., description="作成日時")
     updated_at: datetime = Field(..., description="更新日時")
     model_config = ConfigDict(from_attributes=True)
