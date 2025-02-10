@@ -1,6 +1,6 @@
 import asyncio
 
-from langchain_core.messages import AIMessageChunk, ToolMessage
+from langchain_core.messages import AIMessageChunk, ToolMessage, AIMessage, HumanMessage
 from langchain_core.tools import tool
 from langchain_google_vertexai import ChatVertexAI
 from langgraph.graph.state import END, START, CompiledStateGraph, StateGraph
@@ -13,7 +13,7 @@ from app.services.syagent.components import (
     ProfileGenerator,
 )
 from app.services.syagent.state import SimState
-from app.services.syagent.tools import CareerTool, PotentialTool, RequiredSkillsTool
+from app.services.syagent.tools import CareerTool
 
 
 class SimulationWorkflow:
@@ -32,15 +32,7 @@ class SimulationWorkflow:
         self.current_prof = current_profile
 
     def _define_tools(self, model: ChatVertexAI):
-        skills_tool = RequiredSkillsTool(model)
         career_tool = CareerTool(model)
-        potential_tool = PotentialTool(model)
-
-        @tool
-        def search_required_skills(future_goals: list[str]):
-            """将来の目標に基づき、必要なスキルを取得"""
-            response = skills_tool.chain.invoke({"future_goals": future_goals})
-            return f"将来の目標達成に必要なスキルは以下です。\n{response.content}"
 
         @tool
         def design_career(
@@ -67,81 +59,60 @@ class SimulationWorkflow:
             )
             return f"具体的なキャリアパスの一つは以下です。\n{response.content}"
 
-        @tool
-        def potential(
-            time_frame: int,
-            current_age: int,
-            current_status: str,
-            current_skills: list[str],
-            values: str,
-            restrictions: str,
-            future_goals: list[str],
-        ):
-            """目標が達成可能かを数値で評価（100=容易に達成可能, 0=非常に困難）"""
-            current_prof = CurrentProfile(
-                age=current_age,
-                status=current_status,
-                skills=current_skills,
-                values=values,
-                restrictions=restrictions,
-                future_goals=future_goals,
-                extra="",
-            )
-            response = potential_tool.chain.invoke(
-                {"time_frame": time_frame, "current_prof": current_prof}
-            )
-            return f"目標が達成可能かの評価とその理由は以下です。\n{response.content}"
+        # skills_tool = RequiredSkillsTool(model)
+        # @tool
+        # def search_required_skills(future_goals: list[str]):
+        #     """将来の目標に基づき、必要なスキルを取得"""
+        #     response = skills_tool.chain.invoke({"future_goals": future_goals})
+        #     return f"将来の目標達成に必要なスキルは以下です。\n{response.content}"
 
-        self.tools = [search_required_skills, design_career, potential]
+        self.tools = [design_career]
         return model.bind_tools(self.tools)
 
     def _build_workflow(self) -> CompiledStateGraph:
         def call_model(state: SimState):
+            gathered_info = gathered_info = ", ".join(
+                str(msg.content)
+                for msg in state["messages"]
+                if isinstance(msg, ToolMessage)
+            )
             response = self.future_simulator.run(
-                self.time_frame, self.current_prof, self.gathered_info(state)
+                self.time_frame, self.current_prof, gathered_info
             )
-            return {"messages": response}
-
-        def generate_profile(state: SimState):
-            response = self.prof_generator.generate(
-                self.time_frame, self.current_prof, self.gathered_info(state)
-            )
-            return {"future_profile": response}
+            if response.tool_calls:
+                return {"messages": response}
+            else:
+                profile = self.prof_generator.generate(
+                    self.time_frame, self.current_prof, gathered_info
+                )
+                return {"future_profile": profile}
 
         def should_continue(state: SimState):
             messages = state["messages"]
             last_message = messages[-1]
-            if last_message.tool_calls:
+            if isinstance(last_message, AIMessage) and last_message.tool_calls:
                 return "tools"
-            return "profile_generator"
+            return END
 
         graph = StateGraph(SimState)
         tool_node = ToolNode(self.tools)
         graph.add_node("agent", call_model)
-        graph.add_node("profile_generator", generate_profile)
         graph.add_node("tools", tool_node)
 
         graph.add_edge(START, "agent")
-        graph.add_conditional_edges(
-            "agent", should_continue, ["tools", "profile_generator"]
-        )
+        graph.add_conditional_edges("agent", should_continue, ["tools", END])
         graph.add_edge("tools", "agent")
-        graph.add_edge("profile_generator", END)
         workflow = graph.compile()
         return workflow
-
-    def gathered_info(self, state):
-        gathered_info = [
-            msg.content for msg in state["messages"] if isinstance(msg, ToolMessage)
-        ]
-        return str(gathered_info)
 
     def generate(self, time_frame: int = 10) -> FutureProfile:
         self.time_frame = time_frame
         future_prof = FutureProfile(
             status="", skills=[], time_frame=time_frame, summary=""
         )
-        state = SimState({"messages": [], "future_profile": future_prof})
+        state = SimState(
+            {"messages": [HumanMessage(content="")], "future_profile": future_prof}
+        )
         result = self.workflow.invoke(state)
         return result["future_profile"]
 
