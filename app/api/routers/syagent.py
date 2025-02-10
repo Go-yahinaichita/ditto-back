@@ -7,6 +7,7 @@ from app.db.session import get_db
 from app.schemas import syagent as syagent_schema
 from app.schemas import utils as utils_schema
 
+
 router = APIRouter(prefix="/agents", tags=["agents"])
 
 
