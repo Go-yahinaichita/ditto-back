@@ -7,20 +7,21 @@ from app.db.session import get_db
 from app.schemas import syagent as syagent_schema
 from app.schemas import utils as utils_schema
 
+
 router = APIRouter(prefix="/agents", tags=["agents"])
 
 
 # /agents/{user_id} に対するエンドポイントを定義
 @router.get("/{user_id}", response_model=list[syagent_schema.OutputConversation])
 async def get_conversations(
-    user_id: int, db: AsyncSession = Depends(get_db)
+    user_id: str, db: AsyncSession = Depends(get_db)
 ) -> list[syagent_schema.OutputConversation]:
     return await syagent_crud.read_conversations(db, user_id)
 
 
 @router.post("/{user_id}", response_model=syagent_schema.OutputConversation)
 async def post_conversation(
-    user_id: int,
+    user_id: str,
     current_profile: syagent_schema.CurrentProfile,
     db: AsyncSession = Depends(get_db),
 ) -> syagent_schema.OutputConversation:
