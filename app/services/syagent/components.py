@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 
 from langchain.prompts import ChatPromptTemplate
-from langchain_core.messages import AIMessageChunk
+from langchain_core.messages import AIMessage, AIMessageChunk
 from langchain_google_vertexai import ChatVertexAI
 
 from app.schemas.syagent import ChatState, CurrentProfile, FutureProfile
@@ -44,15 +44,56 @@ class FutureSimulator:
     現在のプロフィールを基に未来のプロフィールを生成する。
     """
 
-    def __init__(self, llm: ChatVertexAI):
+    def __init__(self, llm):
         self.llm = llm
         self.prompt = ChatPromptTemplate(
             [
                 (
                     "system",
                     """
-                あなたはユーザーの{timeframe}年後の未来のプロフィールを作成するアシスタントです。
-                現在のプロフィールに基づいて、成長と目標を反映した未来のプロフィールを生成してください。
+                あなたはユーザの{time_frame}年後の未来のプロフィールを作成するアシスタントです。
+                これまでに集められた情報を確認し、追加の情報が必要な場合は適切なツールを呼び出してください。
+                十分な情報が集まっている場合はツールを呼び出さずに、「情報収集完了」のみ出力してください。        
+                """,
+                ),
+                (
+                    "human",
+                    """
+                現在入手している情報：
+                {current_profile}
+                {gathered_info}
+                """,
+                ),
+            ]
+        )
+
+    def run(
+        self, time_frame: int, current_prof: CurrentProfile, gathered_info: str
+    ) -> AIMessage:
+        chain = self.prompt | self.llm
+        input_data = {
+            "time_frame": time_frame,
+            "current_profile": current_prof.to_str(),
+            "gathered_info": gathered_info,
+        }
+        response = chain.invoke(input_data)
+        return response
+
+
+class ProfileGenerator:
+    """
+    情報をもとに未来のプロフィールを生成する。
+    """
+
+    def __init__(self, llm):
+        self.llm = llm
+        self.prompt = ChatPromptTemplate(
+            [
+                (
+                    "system",
+                    """
+                あなたはユーザーの{time_frame}年後の未来のプロフィールを作成する専門家です。
+                現在のプロフィールとその他の情報に基づいて、成長と目標を反映した未来のプロフィールを生成してください。
                 summaryの項目は生成したプロフィールの立場、職業を10~20文字程度で要約してください。               
                 """,
                 ),
@@ -60,18 +101,22 @@ class FutureSimulator:
                     "human",
                     """
                 {current_profile}
+                追加情報：{gathered_info}
                 """,
                 ),
             ]
         )
 
-    def generate_future_profile(self, state: ChatState) -> FutureProfile:
+    def generate(
+        self, time_frame: int, current_prof: CurrentProfile, gathered_info: str
+    ) -> FutureProfile:
         chain = self.prompt | self.llm.with_structured_output(FutureProfile)
         input_data = {
-            "timeframe": state.future_prof.time_frame,
-            "current_profile": state.current_prof.to_str(),
+            "time_frame": time_frame,
+            "current_profile": current_prof.to_str(),
+            "gathered_info": gathered_info,
         }
-        response: FutureProfile = chain.invoke(input_data)  # type:ignore
+        response: FutureProfile = chain.invoke(input_data)
         return response
 
 

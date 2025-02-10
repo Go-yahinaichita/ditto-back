@@ -78,7 +78,10 @@ class FutureProfile(BaseModel):
     summary: str = Field(..., description="プロフィールの要約")
 
     def to_str(self):
-        return f" {self.time_frame}年後の立場や職業: {self.status}、{self.time_frame}年間で獲得したスキル:{', '.join(self.skills)}"
+        return (
+            f" {self.time_frame}年後の立場や職業: {self.status}\n"
+            f"{self.time_frame}年間で獲得したスキル:{', '.join(self.skills)}\n"
+        )
 
 
 class ChatState(BaseModel):
